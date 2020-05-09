@@ -1,48 +1,59 @@
 import React, { Component } from 'react'
 
+import AddCommit from '../addCommit/AddCommit.jsx'
+import CommitList from '../commitList/CommitList.jsx'
+
 // 定义组件
 export default class App extends Component {
   constructor(props) {
     super(props)
 
-    // 评论列表数据
     this.state = {
-      commentsList: [
+      commitList: [
         {
           username: '张三',
-          content: 'React不错'
+          content: 'react不难'
         },
         {
           username: '李四',
-          content: 'React有点难'
+          content: 'react难学'
         }
       ]
     }
 
     // 修正 this 指向
     this.add = this.add.bind(this);
-
+    this.del = this.del.bind(this);
   }
 
-  // 增加评论
-  add() {
-    // 获取用户填写的数据
-    const username = this.refs.username.value.trim();
-    const content = this.refs.content.value.trim();
+  add(item) {
+    // 获取数据
+    const { commitList } = this.state;
+    // 从顶部添加数据
+    commitList.unshift(item);
+    // 更新 this.state 的数据
+    this.setState({
+      commitList
+    })
+  }
 
-    // 判断用户是否填写内容
-    if(!username || !content){
-      alert('请输入内容')
+  del(index) {
+    // 获取数据
+    const { commitList } = this.state;
+    if (window.confirm(`是否要删除${commitList[index].username}这条评论`)) {
+      // 删除对应的item
+      commitList.splice(index, 1);
+      // 更新 this.state 的数据
+      this.setState({
+        commitList
+      })
     }
-    
+
   }
 
   render() {
-    // 获取评论列表
-    const { commentsList } = this.state;
-
-    //判断是否显示或隐藏
-    const display = commentsList.length ? 'none' : 'block'
+    // 获取数据
+    const { commitList } = this.state;
 
     return (
       <div>
@@ -57,46 +68,10 @@ export default class App extends Component {
         </header>
 
         <div className="container">
+          {/* add方法是通过标签的属性传递给AddCommit组件 */}
+          <AddCommit add={this.add}/>
 
-          <div className="col-md-4">
-            <form className="form-horizontal">
-              <div className="form-group">
-                <label>用户名</label>
-                <input type="text" className="form-control" placeholder="用户名"
-                  ref="username" />
-              </div>
-              <div className="form-group">
-                <label>评论内容</label>
-                <textarea className="form-control" rows="6" placeholder="评论内容"
-                  ref="content"></textarea>
-              </div>
-              <div className="form-group">
-                <div className="col-sm-offset-2 col-sm-10">
-                  <button type="button" className="btn btn-default pull-right" onClick={this.add}>提交</button>
-                </div>
-              </div>
-            </form>
-          </div>
-
-          <div className="col-md-8">
-            <h3 className="reply">评论回复：</h3>
-            <h2 style={{ display }}>暂无评论，点击左侧添加评论！！！</h2>
-            <ul className="list-group">
-
-              {
-                commentsList.map((item, index) =>
-                  <li key={index} className="list-group-item">
-                    <div className="handle">
-                      <a href="www.baidu.com">删除</a>
-                    </div>
-                    <p className="user"><span>{item.username}</span><span>说:</span></p>
-                    <p className="centence">{item.content}</p>
-                  </li>
-                )
-              }
-
-            </ul>
-          </div>
+          <CommitList commitList={commitList} del={this.del}/>
 
         </div>
 
